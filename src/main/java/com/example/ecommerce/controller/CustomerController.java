@@ -50,6 +50,15 @@ public class CustomerController {
     public ResponseEntity<?> findAllCustomer(){
         return new ResponseEntity<>(userService.findAllUser(),HttpStatus.OK);
     }
+    @PostMapping("/updateUserInfo/{id}")
+    public ResponseEntity<?> updateUserInfo(@PathVariable("id") Long id,@RequestBody UpdateUserRequest updateUserRequest){
+        return new ResponseEntity<>(userService.updateUserInfo(id,updateUserRequest),HttpStatus.OK);
+    }
+
+    @DeleteMapping("/removeItem/{id}/{productId}")
+    public void removeItemFromCart(@PathVariable("id") Long id,@PathVariable("productId") Long productId){
+        userService.removeItemFromCart(id,productId);
+    }
 
 
 }

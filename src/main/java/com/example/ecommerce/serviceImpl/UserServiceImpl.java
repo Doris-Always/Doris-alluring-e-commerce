@@ -3,10 +3,7 @@ package com.example.ecommerce.serviceImpl;
 import com.example.ecommerce.dto.request.*;
 import com.example.ecommerce.dto.response.LoginResponse;
 import com.example.ecommerce.exception.UserAlreadyExistException;
-import com.example.ecommerce.model.Cart;
-import com.example.ecommerce.model.CartProduct;
-import com.example.ecommerce.model.Role;
-import com.example.ecommerce.model.User;
+import com.example.ecommerce.model.*;
 import com.example.ecommerce.repository.CartRepository;
 import com.example.ecommerce.repository.UserRepository;
 import com.example.ecommerce.service.CartService;
@@ -108,7 +105,7 @@ public class UserServiceImpl implements UserService {
         foundUser.setFirstName(updateUserRequest.getFirstName());
         foundUser.setLastName(updateUserRequest.getLastName());
         foundUser.setEmail(updateUserRequest.getEmail());
-        userRepository.save(foundUser);
+        foundUser = userRepository.save(foundUser);
         return foundUser;
     }
 
@@ -116,9 +113,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addToCart(Long userId, AddToCartRequest cartRequest) {
         User foundUser = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("Customer not found"));
+//        Long product = cartRequest.getProductId();
           CartProduct cartProduct = new CartProduct();
           cartProduct.setProductName(cartRequest.getProductName());
           cartProduct.setQuantity(cartRequest.getQuantity());
+//          cartProduct.setPricePerUnit();
           CartProduct savedCartProduct = cartProductService.addCartProduct(cartProduct);
           foundUser.getCart().getCartProducts().add(savedCartProduct);
           userRepository.save(foundUser);
