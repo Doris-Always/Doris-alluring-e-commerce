@@ -1,12 +1,10 @@
 package com.example.ecommerce.serviceImpl;
 
 import com.example.ecommerce.model.Cart;
-import com.example.ecommerce.model.CartProduct;
 import com.example.ecommerce.repository.CartRepository;
 import com.example.ecommerce.service.CartProductService;
 import com.example.ecommerce.service.CartService;
-import com.example.ecommerce.service.CustomerService;
-import org.modelmapper.ModelMapper;
+import com.example.ecommerce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +15,7 @@ public class CartServiceImpl implements CartService {
     @Autowired
     CartRepository cartRepository;
     @Autowired
-    CustomerService customerService;
+    UserService customerService;
     @Autowired
     CartProductService cartProductService;
 
@@ -32,6 +30,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart viewAllProductInCart() {
+
         return null;
     }
 

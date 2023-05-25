@@ -45,7 +45,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product updateProduct(Long productId,UpdateProductRequest updateProductRequest) {
         Product foundProduct = productRepository.findProductById(productId);
-        System.out.println("outside if block");
         if (foundProduct != null){
             foundProduct.setProductName(updateProductRequest.getProductName());
             foundProduct.setQuantity(updateProductRequest.getQuantity());

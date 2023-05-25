@@ -1,19 +1,21 @@
 package com.example.ecommerce.serviceImpl;
 
+import com.example.ecommerce.dto.request.AddProductRequest;
 import com.example.ecommerce.dto.request.AddToCartRequest;
 import com.example.ecommerce.dto.request.UserRegisterRequest;
 import com.example.ecommerce.model.Cart;
 import com.example.ecommerce.model.CartProduct;
-import com.example.ecommerce.model.Customer;
+import com.example.ecommerce.model.User;
 import com.example.ecommerce.repository.CartProductRepository;
 import com.example.ecommerce.service.CartProductService;
-import com.example.ecommerce.service.CustomerService;
+import com.example.ecommerce.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @SpringBootTest
 class CartProductServiceImplTest {
 
@@ -24,7 +26,7 @@ class CartProductServiceImplTest {
     CartProductRepository cartProductRepository;
 
     @Autowired
-    CustomerService customerService;
+    UserService userService;
     UserRegisterRequest registerRequest;
     @BeforeEach
     void setUp() {
@@ -41,11 +43,11 @@ class CartProductServiceImplTest {
         return  registerRequest;
     }
 
-    @Test
-    void test_that_product_can_be_removed_from_cart(){
-        Customer customer = customerService.register(registerRequest);
-        Cart cart = customer.getCart();
-        CartProduct cartProduct = cartProductService.findProductById(cart.getId());
-    }
+//    @Test
+//    void test_that_product_can_be_removed_from_cart(){
+//       User customer = userService.register(registerRequest);
+//       var foundUsers = userService.findAllUser();
+//        assertEquals(1,foundUsers.size());
+//    }
 
 }

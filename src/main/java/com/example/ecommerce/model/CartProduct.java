@@ -14,6 +14,7 @@ public class CartProduct{
     private String productName;
     private int quantity;
     private BigDecimal pricePerUnit;
+    @Enumerated(EnumType.STRING)
     private Category category;
     private BigDecimal totalPrice;
 

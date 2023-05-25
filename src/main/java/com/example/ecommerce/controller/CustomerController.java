@@ -1,10 +1,8 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.request.*;
-import com.example.ecommerce.model.Customer;
-import com.example.ecommerce.service.CartService;
 import com.example.ecommerce.service.ChangePasswordService;
-import com.example.ecommerce.service.CustomerService;
+import com.example.ecommerce.service.UserService;
 import com.example.ecommerce.service.ForgetPasswordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/ecommerce")
 public class CustomerController {
     @Autowired
-    CustomerService customerService;
+    UserService userService;
 
     @Autowired
     ChangePasswordService changePasswordService;
@@ -25,12 +23,12 @@ public class CustomerController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRegisterRequest registerRequest){
-        return new ResponseEntity<>(customerService.register(registerRequest), HttpStatus.OK);
+        return new ResponseEntity<>(userService.register(registerRequest), HttpStatus.OK);
 
     }
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
-        return new ResponseEntity<>(customerService.login(loginRequest),HttpStatus.OK);
+        return new ResponseEntity<>(userService.login(loginRequest),HttpStatus.OK);
     }
     @PostMapping("/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordReq changePasswordReq){
@@ -42,15 +40,15 @@ public class CustomerController {
     }
     @PostMapping("/addToCart/{id}")
     public ResponseEntity<?> addToCart( @PathVariable("id") Long id,@RequestBody AddToCartRequest cartRequest){
-       return new ResponseEntity<>(customerService.addToCart(id,cartRequest),HttpStatus.OK);
+       return new ResponseEntity<>(userService.addToCart(id,cartRequest),HttpStatus.OK);
     }
     @GetMapping("/findCustomer/{id}")
     public ResponseEntity<?> findCustomerById(@PathVariable Long id){
-        return new ResponseEntity<>(customerService.findCustomerById(id),HttpStatus.OK);
+        return new ResponseEntity<>(userService.findUserById(id),HttpStatus.OK);
     }
     @GetMapping("/findAllCustomer")
     public ResponseEntity<?> findAllCustomer(){
-        return new ResponseEntity<>(customerService.findAllCustomer(),HttpStatus.OK);
+        return new ResponseEntity<>(userService.findAllUser(),HttpStatus.OK);
     }
 
 

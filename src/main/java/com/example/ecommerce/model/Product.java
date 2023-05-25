@@ -14,5 +14,6 @@ public class Product {
     private String productName;
     private int quantity;
     private BigDecimal pricePerUnit;
+    @Enumerated(EnumType.STRING)
     private Category category;
 }

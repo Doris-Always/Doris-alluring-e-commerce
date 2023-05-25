@@ -1,8 +1,8 @@
 package com.example.ecommerce.serviceImpl;
 
 import com.example.ecommerce.dto.request.ChangePasswordReq;
-import com.example.ecommerce.model.Customer;
-import com.example.ecommerce.repository.CustomerRepository;
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,11 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -23,7 +20,7 @@ class ChangePasswordServiceImplTest {
     @InjectMocks
     ChangePasswordServiceImpl changePasswordService;
     @Mock
-    CustomerRepository customerRepository;
+    UserRepository userRepository;
     @BeforeEach
     void setUp() {
     }
@@ -35,14 +32,14 @@ class ChangePasswordServiceImplTest {
         changePasswordReq.setOldPassword("23457");
         changePasswordReq.setNewPassword("98562");
         changePasswordReq.setConfirmPassword("98562");
-        Customer foundCustomer = new Customer();
+        User foundCustomer = new User();
         foundCustomer.setEmail("doris@gmail.com");
         foundCustomer.setPassword("23457");
 
-        when(customerRepository.findUserByEmail(changePasswordReq.getEmail())).thenReturn(foundCustomer);
-        when(customerRepository.save(foundCustomer)).thenReturn(foundCustomer);
+        when(userRepository.findUserByEmail(changePasswordReq.getEmail())).thenReturn(foundCustomer);
+        when(userRepository.save(foundCustomer)).thenReturn(foundCustomer);
         changePasswordService.changePassword(changePasswordReq);
-         foundCustomer = customerRepository.findUserByEmail(changePasswordReq.getEmail());
+         foundCustomer = userRepository.findUserByEmail(changePasswordReq.getEmail());
         assertEquals(changePasswordReq.getNewPassword(),foundCustomer.getPassword());
 
 

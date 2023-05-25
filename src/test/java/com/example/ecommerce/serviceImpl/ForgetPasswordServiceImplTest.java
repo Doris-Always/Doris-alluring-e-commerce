@@ -1,21 +1,15 @@
 package com.example.ecommerce.serviceImpl;
 
-import com.example.ecommerce.dto.request.ChangePasswordReq;
 import com.example.ecommerce.dto.request.ResetPasswordReq;
-import com.example.ecommerce.dto.response.ApiResponse;
-import com.example.ecommerce.model.Customer;
-import com.example.ecommerce.repository.CustomerRepository;
-import com.example.ecommerce.service.ForgetPasswordService;
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -27,7 +21,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ForgetPasswordServiceImplTest {
     @Mock
-    CustomerRepository customerRepository;
+    UserRepository userRepository;
 
     @InjectMocks
     ForgetPasswordServiceImpl forgetPasswordService;
@@ -41,15 +35,15 @@ class ForgetPasswordServiceImplTest {
         resetPasswordReq.setEmail("dorisebele47@gmail.com");
         resetPasswordReq.setNewPassword("12345");
         resetPasswordReq.setConfirmPassword("12345");
-        Customer customer = new Customer();
-        customer.setEmail("dorisebele47@gmail.com");
-        customer.setPassword("12345");
-        when(customerRepository.findUserByEmail(resetPasswordReq.getEmail())).thenReturn(customer);
+        User user = new User();
+        user.setEmail("dorisebele47@gmail.com");
+        user.setPassword("12345");
+        when(userRepository.findUserByEmail(resetPasswordReq.getEmail())).thenReturn(user);
         ResponseEntity<?> resetResponse =
                 forgetPasswordService.resetPassword(resetPasswordReq);
-        assertNotNull(customer);
+        assertNotNull(user);
         assertEquals(HttpStatus.OK,resetResponse.getStatusCode());
-        assertEquals(resetPasswordReq.getNewPassword(),customer.getPassword());
+        assertEquals(resetPasswordReq.getNewPassword(),user.getPassword());
 
     }
 }
