@@ -56,7 +56,7 @@ public class CustomerController {
     }
 
     @DeleteMapping("/removeItem/{id}/{productId}")
-    public void removeItemFromCart(@PathVariable("id") Long id,@PathVariable("productId") Long productId){
+    public void removeItemFromCart(@PathVariable Long id,@PathVariable Long productId){
         userService.removeItemFromCart(id,productId);
     }
 

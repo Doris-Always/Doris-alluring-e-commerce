@@ -22,9 +22,9 @@ public class OrderHistory {
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    private List<CartProduct> cartProducts = new ArrayList<>();
+//    @OneToMany(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "product_id", referencedColumnName = "id")
+//    private List<CartProduct> cartProducts = new ArrayList<>();
     @CreationTimestamp
     private Instant orderTime;
 

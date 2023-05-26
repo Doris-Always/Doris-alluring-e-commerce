@@ -29,17 +29,13 @@ public class CartProductServiceImpl implements CartProductService {
 
     @Override
     public List<CartProduct> getAllCartProduct() {
-        return null;
+        return cartProductRepository.findAll();
     }
 
-    @Override
-    public void deleteProductById(Long productId) {
-
-    }
 
     @Override
     public void deleteAllProduct() {
-
+        cartProductRepository.deleteAll();
     }
 
     @Override

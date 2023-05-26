@@ -5,4 +5,5 @@ import com.example.ecommerce.model.Cart;
 public interface CartService {
     void addToCart(Cart cart);
     Cart viewAllProductInCart();
+    void removeItemFromCart(Long cartProductId);
 }

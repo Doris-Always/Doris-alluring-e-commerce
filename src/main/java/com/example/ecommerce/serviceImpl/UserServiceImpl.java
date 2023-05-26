@@ -4,8 +4,11 @@ import com.example.ecommerce.dto.request.*;
 import com.example.ecommerce.dto.response.LoginResponse;
 import com.example.ecommerce.exception.UserAlreadyExistException;
 import com.example.ecommerce.model.*;
+import com.example.ecommerce.repository.CartProductRepository;
 import com.example.ecommerce.repository.CartRepository;
+import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.repository.UserRepository;
+import com.example.ecommerce.service.CartProductService;
 import com.example.ecommerce.service.CartService;
 import com.example.ecommerce.service.UserService;
 import com.example.ecommerce.service.EmailService;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +42,11 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     CartService cartService;
+    @Autowired
+    ProductRepository productRepository;
+
+    @Autowired
+    CartProductRepository cartProductRepository;
 
     ModelMapper mapper = new ModelMapper();
 
@@ -113,11 +122,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addToCart(Long userId, AddToCartRequest cartRequest) {
         User foundUser = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("Customer not found"));
-//        Long product = cartRequest.getProductId();
+        Product product = productRepository.findProductById(cartRequest.getProductId());
           CartProduct cartProduct = new CartProduct();
           cartProduct.setProductName(cartRequest.getProductName());
           cartProduct.setQuantity(cartRequest.getQuantity());
-//          cartProduct.setPricePerUnit();
+          cartProduct.setProductId(product.getId());
+          cartProduct.setPricePerUnit(product.getPricePerUnit());
+          cartProduct.setCategory(product.getCategory());
+          cartProduct.setCart(foundUser.getCart());
+          cartProduct.setTotalPrice(calculateTotalPrice(cartRequest.getQuantity(),product.getPricePerUnit()));
           CartProduct savedCartProduct = cartProductService.addCartProduct(cartProduct);
           foundUser.getCart().getCartProducts().add(savedCartProduct);
           userRepository.save(foundUser);
@@ -125,20 +138,25 @@ public class UserServiceImpl implements UserService {
 
         }
 
-
+    public BigDecimal calculateTotalPrice(int quantity,BigDecimal unitPrice){
+        BigDecimal myQuantity = new BigDecimal(quantity);
+        BigDecimal totalPrice = myQuantity.multiply(unitPrice);
+        return totalPrice;
+    }
 
 
     public void removeItemFromCart(Long userId, Long productId) {
             User foundUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Customer not found"));
-            var cartProducts = foundUser.getCart().getCartProducts();
-            for (int i = 0; i < cartProducts.size(); i++) {
-                if (cartProducts.get(i).getId().equals(productId)) {
-                    cartProducts.remove(i);
+            Cart cart = cartRepository.findById(userId).get();
+            List<CartProduct> products = cart.getCartProducts();
+            for (int j = 0; j < products.size(); j++){
+                if (products.get(j).getProductId().equals(productId)){
+                    products.remove(products.get(j));
                 }
             }
+            cartProductService.removeCartProducts(productId);
+            cartRepository.save(cart);
             userRepository.save(foundUser);
-
-
         }
 }
 

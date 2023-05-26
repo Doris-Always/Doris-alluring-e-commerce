@@ -1,6 +1,7 @@
 package com.example.ecommerce.serviceImpl;
 
 import com.example.ecommerce.model.Cart;
+import com.example.ecommerce.model.User;
 import com.example.ecommerce.repository.CartRepository;
 import com.example.ecommerce.service.CartProductService;
 import com.example.ecommerce.service.CartService;
@@ -32,6 +33,10 @@ public class CartServiceImpl implements CartService {
     public Cart viewAllProductInCart() {
 
         return null;
+    }
+
+    @Override
+    public void removeItemFromCart(Long cartProductId){
     }
 
 }
