@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.dto.request.UpdateCartProductReq;
 import com.example.ecommerce.model.CartProduct;
 import com.example.ecommerce.model.Product;
 
@@ -15,4 +16,8 @@ public interface CartProductService {
    void deleteAllProduct();
 
     void removeCartProducts(Long productId);
+
+    CartProduct updateCartProduct(UpdateCartProductReq updateCartProductReq);
+
+   CartProduct getCartProductByName(String name);
 }

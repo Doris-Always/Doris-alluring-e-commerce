@@ -15,18 +15,21 @@ import java.util.List;
 public class OrderHistory {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
+    private Long orderId;
     private int quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    private String productName;
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
-//    @OneToMany(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "product_id", referencedColumnName = "id")
-//    private List<CartProduct> cartProducts = new ArrayList<>();
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "Address_id")
+    private Address deliveryAddress;
+    @OneToMany(mappedBy = "orderHistory", cascade = CascadeType.ALL)
+    List<OrderItem> orderItems;
     @CreationTimestamp
-    private Instant orderTime;
+    private Instant orderDate;
 
 
 

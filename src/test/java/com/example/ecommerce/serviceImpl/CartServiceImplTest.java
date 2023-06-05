@@ -1,6 +1,7 @@
 package com.example.ecommerce.serviceImpl;
 
 import com.example.ecommerce.dto.request.AddToCartRequest;
+import com.example.ecommerce.dto.request.UpdateCartProductReq;
 import com.example.ecommerce.dto.request.UserRegisterRequest;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.repository.CartRepository;
@@ -78,6 +79,9 @@ class CartServiceImplTest {
 
 
     }
+
+
+
 //    @Test
 //    void test_that_customer_can_remove_product_from_cart(){
 //            //given that a customer exist

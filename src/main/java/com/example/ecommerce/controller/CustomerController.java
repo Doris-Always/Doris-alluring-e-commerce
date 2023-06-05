@@ -1,6 +1,7 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.request.*;
+import com.example.ecommerce.service.CartProductService;
 import com.example.ecommerce.service.ChangePasswordService;
 import com.example.ecommerce.service.UserService;
 import com.example.ecommerce.service.ForgetPasswordService;
@@ -17,6 +18,9 @@ public class CustomerController {
 
     @Autowired
     ChangePasswordService changePasswordService;
+
+    @Autowired
+    CartProductService cartProductService;
 
     @Autowired
     ForgetPasswordService forgetPasswordService;
@@ -58,6 +62,10 @@ public class CustomerController {
     @DeleteMapping("/removeItem/{id}/{productId}")
     public void removeItemFromCart(@PathVariable Long id,@PathVariable Long productId){
         userService.removeItemFromCart(id,productId);
+    }
+    @PostMapping("/updateCartProduct")
+    public ResponseEntity<?> updateCartProduct(@RequestBody UpdateCartProductReq updateCartProductReq){
+            return new ResponseEntity<>( cartProductService.updateCartProduct(updateCartProductReq),HttpStatus.OK);
     }
 
 

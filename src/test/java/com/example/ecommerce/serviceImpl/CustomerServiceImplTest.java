@@ -37,7 +37,7 @@ class CustomerServiceImplTest {
     @Mock
     EmailServiceImpl emailServiceImpl;
     @Captor
-            private  ArgumentCaptor<User> userArgumentCaptor;
+    private  ArgumentCaptor<User> userArgumentCaptor;
 
     UserRegisterRequest customerRequest;
     LoginRequest loginRequest;

@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
         userRoles.add(Role.USER);
         userRoles.add(Role.CUSTOMER);
         user.setUserRoles(userRoles);
-        emailService.sendOTP(user.getEmail());
+//        emailService.sendOTP(user.getEmail());
         userRepository.save(user);
         return user;
 
