@@ -2,27 +2,23 @@ package com.example.ecommerce.serviceImpl;
 
 import com.example.ecommerce.dto.request.*;
 import com.example.ecommerce.dto.response.LoginResponse;
+import com.example.ecommerce.dto.response.PaymentResponse;
+import com.example.ecommerce.exception.OrderNotFoundException;
+import com.example.ecommerce.exception.ProductNotSufficientException;
 import com.example.ecommerce.exception.UserAlreadyExistException;
+import com.example.ecommerce.exception.UserNotFoundException;
 import com.example.ecommerce.model.*;
-import com.example.ecommerce.repository.CartProductRepository;
-import com.example.ecommerce.repository.CartRepository;
-import com.example.ecommerce.repository.ProductRepository;
-import com.example.ecommerce.repository.UserRepository;
-import com.example.ecommerce.service.CartProductService;
-import com.example.ecommerce.service.CartService;
-import com.example.ecommerce.service.UserService;
-import com.example.ecommerce.service.EmailService;
+import com.example.ecommerce.repository.*;
+import com.example.ecommerce.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 
@@ -35,8 +31,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     CartProductServiceImpl cartProductService;
-
-
+    @Autowired
+    OrderItemRepository orderItemRepository;
     @Autowired
     CartRepository cartRepository;
 
@@ -47,12 +43,22 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     CartProductRepository cartProductRepository;
+    @Autowired
+    ProductService productService;
+    @Autowired
+    OrderHistoryService orderHistoryService;
+    @Autowired
+    OrderItemService orderItemService;
+    @Autowired
+    PaymentService paymentService;
+    @Autowired
+    OrderHistoryRepository orderHistoryRepository;
 
     ModelMapper mapper = new ModelMapper();
 
     @Override
     public User register(UserRegisterRequest registerRequest) {
-        Optional<User> foundUser = Optional.ofNullable(userRepository.findUserByEmail(registerRequest.getEmail()));
+        Optional<User> foundUser = userRepository.findUserByEmail(registerRequest.getEmail());
         if (foundUser.isPresent()){
             throw new UserAlreadyExistException("User Already Exist");
         }
@@ -66,7 +72,7 @@ public class UserServiceImpl implements UserService {
         userRoles.add(Role.USER);
         userRoles.add(Role.CUSTOMER);
         user.setUserRoles(userRoles);
-//        emailService.sendOTP(user.getEmail());
+        emailService.sendOTP(user.getEmail());
         userRepository.save(user);
         return user;
 
@@ -75,9 +81,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        User foundUser = userRepository.findUserByEmail(loginRequest.getEmail());
+        Optional<User> foundUser = userRepository.findUserByEmail(loginRequest.getEmail());
 
-        if (foundUser != null && PasswordEncoder.checkPwd(loginRequest.getPassword(), foundUser.getPassword())){
+        if (foundUser.isPresent() && PasswordEncoder.checkPwd(loginRequest.getPassword(), foundUser.get().getPassword())){
             return new LoginResponse("login successful",HttpStatus.OK,LocalDateTime.now());
 
         }
@@ -90,17 +96,17 @@ public class UserServiceImpl implements UserService {
         return userRepository.count();
     }
     @Override
-    public List<User> findAllUser() {
+    public List<User> getAllUser() {
         return userRepository.findAll();
 
 
     }
 
-
     @Override
-    public User findUserById(Long userId) {
-        var user = userRepository.findById(userId);
-        return user.get();
+    public Optional<User> findUserById(Long userId) {
+        if (userRepository.findById(userId).isEmpty()) throw new UserNotFoundException("user not found");
+        return userRepository.findById(userId);
+//        return user.get();
     }
 
     @Override
@@ -109,8 +115,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findUserByEmail(String email) {
+        return userRepository.findUserByEmail(email).orElseThrow(()->new UserNotFoundException("user not found"));
+    }
+
+    @Override
     public User updateUserInfo(Long userId,UpdateUserRequest updateUserRequest) {
-        User foundUser = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("user not found"));
+        User foundUser = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("user not found"));
         foundUser.setFirstName(updateUserRequest.getFirstName());
         foundUser.setLastName(updateUserRequest.getLastName());
         foundUser.setEmail(updateUserRequest.getEmail());
@@ -121,7 +132,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String addToCart(Long userId, AddToCartRequest cartRequest) {
-        User foundUser = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("Customer not found"));
+        User foundUser = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("Customer not found"));
         Product product = productRepository.findProductById(cartRequest.getProductId());
           CartProduct cartProduct = new CartProduct();
           cartProduct.setProductName(cartRequest.getProductName());
@@ -146,7 +157,7 @@ public class UserServiceImpl implements UserService {
 
 
     public void removeItemFromCart(Long userId, Long productId) {
-            User foundUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+            User foundUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Customer not found"));
             Cart cart = cartRepository.findById(userId).get();
             List<CartProduct> products = cart.getCartProducts();
             for (int j = 0; j < products.size(); j++){
@@ -158,6 +169,52 @@ public class UserServiceImpl implements UserService {
             cartRepository.save(cart);
             userRepository.save(foundUser);
         }
+
+    @Override
+    public OrderHistory orderProduct(OrderProductRequest orderProductRequest) {
+        Optional<User> existingUser = findUserById(orderProductRequest.getUserId());
+        if (existingUser.isEmpty()){
+            throw new UserNotFoundException("user does not exist,please register");
+        }
+        Product existingProduct = productService.findProductById(orderProductRequest.getProductId());
+        OrderHistory orderHistory = new OrderHistory();
+        orderHistory.setUser(existingUser.get());
+        orderHistory.setDeliveryAddress(orderProductRequest.getDeliveryAddress());
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProduct(existingProduct);
+        orderItem.setPrice(existingProduct.getPricePerUnit());
+        if (orderProductRequest.getQuantity() <= existingProduct.getQuantity()) {
+            orderItem.setQuantity(orderProductRequest.getQuantity());
+            existingProduct.setQuantity(existingProduct.getQuantity() - orderProductRequest.getQuantity());
+        }else {
+            throw new ProductNotSufficientException("product quantity is not sufficient");
+        }
+        orderItem.setSubTotal(existingProduct.getPricePerUnit().multiply(new BigDecimal(orderProductRequest.getQuantity())));
+        List<OrderItem> orderItems = orderItemRepository.findAll();
+        orderItems.add(orderItem);
+        orderHistory.setOrderItems(orderItems);
+        productService.saveProduct(existingProduct);
+        orderHistory.setPaymentStatus(PaymentStatus.PENDING);
+        return orderHistoryService.saveOrder(orderHistory);
+    }
+
+    @Override
+    public void cancelOrder(Long orderId) {
+        OrderHistory existingOrder= orderHistoryService.findById(orderId).orElseThrow(() -> new OrderNotFoundException("order not found"));
+        orderHistoryService.deleteOrderById(existingOrder.getOrderId());
+    }
+
+    @Override
+    public String makePayment(Long orderId,PaymentRequest paymentRequest) {
+        OrderHistory existingOrder = orderHistoryRepository.findById(orderId).orElseThrow(()->new IllegalArgumentException("order not found"));
+        paymentService.pay(paymentRequest);
+        existingOrder.setPaymentStatus(PaymentStatus.PAYMENT_SUCCESSFUL);
+        orderHistoryService.saveOrder(existingOrder);
+        String receiver = existingOrder.getUser().getEmail();
+        emailService.sendPaymentConfirmationEmail(receiver);
+        return "payment successful";
+    }
+
 }
 
 

@@ -21,8 +21,7 @@ public class ForgetPasswordServiceImpl implements ForgetPasswordService {
 
     @Override
     public ResponseEntity<?> resetPassword(ResetPasswordReq resetPasswordReq) {
-        User foundCustomer = userRepository.findUserByEmail(resetPasswordReq.getEmail());
-        if (foundCustomer == null) throw new UserNotFoundException("Customer does not exist");
+        User foundCustomer = userRepository.findUserByEmail(resetPasswordReq.getEmail()).orElseThrow(()->new UserNotFoundException("customer does not exist"));
         if (!Objects.equals(resetPasswordReq.getNewPassword(), resetPasswordReq.getConfirmPassword())) throw new PasswordMismatchException("Password is not a match");
         foundCustomer.setPassword(resetPasswordReq.getNewPassword());
         userRepository.save(foundCustomer);

@@ -1,6 +1,7 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.request.*;
+import com.example.ecommerce.model.OrderHistory;
 import com.example.ecommerce.service.CartProductService;
 import com.example.ecommerce.service.ChangePasswordService;
 import com.example.ecommerce.service.UserService;
@@ -52,7 +53,7 @@ public class CustomerController {
     }
     @GetMapping("/findAllCustomer")
     public ResponseEntity<?> findAllCustomer(){
-        return new ResponseEntity<>(userService.findAllUser(),HttpStatus.OK);
+        return new ResponseEntity<>(userService.getAllUser(),HttpStatus.OK);
     }
     @PostMapping("/updateUserInfo/{id}")
     public ResponseEntity<?> updateUserInfo(@PathVariable("id") Long id,@RequestBody UpdateUserRequest updateUserRequest){
@@ -67,6 +68,17 @@ public class CustomerController {
     public ResponseEntity<?> updateCartProduct(@RequestBody UpdateCartProductReq updateCartProductReq){
             return new ResponseEntity<>( cartProductService.updateCartProduct(updateCartProductReq),HttpStatus.OK);
     }
+    @PostMapping("/order")
+    public ResponseEntity<?> orderProduct(@RequestBody OrderProductRequest orderProductRequest){
+        return new ResponseEntity<>(userService.orderProduct(orderProductRequest),HttpStatus.OK);
+    }
+    @DeleteMapping("/cancelOrder/{orderId}")
+    public void cancelOrder(@PathVariable Long orderId){
+        userService.cancelOrder(orderId);
+    }
 
-
+    @PostMapping("/makePayment/{id}")
+    public ResponseEntity<?> makePayment(@PathVariable Long id, @RequestBody PaymentRequest paymentRequest){
+        return new ResponseEntity<>(userService.makePayment(id,paymentRequest),HttpStatus.OK);
+    }
 }

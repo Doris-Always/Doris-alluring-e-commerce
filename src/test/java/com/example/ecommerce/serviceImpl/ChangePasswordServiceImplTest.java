@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +34,7 @@ class ChangePasswordServiceImplTest {
         changePasswordReq.setOldPassword("23457");
         changePasswordReq.setNewPassword("98562");
         changePasswordReq.setConfirmPassword("98562");
-        User foundCustomer = new User();
+        Optional<User> foundCustomer = new User();
         foundCustomer.setEmail("doris@gmail.com");
         foundCustomer.setPassword("23457");
 

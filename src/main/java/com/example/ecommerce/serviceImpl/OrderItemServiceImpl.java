@@ -1,37 +1,40 @@
 package com.example.ecommerce.serviceImpl;
 
+import com.example.ecommerce.dto.request.CreateOrderItemRequest;
 import com.example.ecommerce.dto.request.UpdateOrderItemRequest;
 import com.example.ecommerce.model.OrderHistory;
 import com.example.ecommerce.model.OrderItem;
 import com.example.ecommerce.repository.OrderItemRepository;
 import com.example.ecommerce.service.OrderItemService;
+import com.example.ecommerce.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class OrderItemServiceImpl implements OrderItemService {
     @Autowired
     OrderItemRepository orderItemRepository;
+    @Autowired
+    ProductService productService;
+
     @Override
-    public OrderItem createOrderItem(OrderItem orderItem) {
-        if (orderItem.getProduct() == null){
-            throw new IllegalArgumentException("no product of such exist");
-        }else {
-            orderItem.setProduct(orderItem.getProduct());
+    public OrderItem createOrderItem(CreateOrderItemRequest createOrderItemRequest) {
+        var foundProduct = productService.findProductById(createOrderItemRequest.getProductId());
+        OrderItem orderItem = new OrderItem();
+        if (foundProduct !=null){
+             orderItem.setProduct(foundProduct);
         }
-        if (orderItem.getOrderHistory() == null){
-            throw new IllegalArgumentException("order does not exist");
-        }else {
-            orderItem.setOrderHistory(orderItem.getOrderHistory());
-        }
-        orderItem.setSubTotal(calculateOrderItemTotal(orderItem.getQuantity(),orderItem.getPrice()));
+        orderItem.setOrderHistory(createOrderItemRequest.getOrderHistory());
+        orderItem.setPrice(createOrderItemRequest.getPrice());
+        orderItem.setSubTotal(calculateOrderItemTotal(createOrderItemRequest.getQuantity(), createOrderItemRequest.getPrice()));
         orderItemRepository.save(orderItem);
         return orderItem;
     }
 
-    @Override
+        @Override
     public OrderItem getOrderItemById(Long orderItemId) {
         return orderItemRepository.findById(orderItemId).orElseThrow(()->new IllegalArgumentException("order does not exist"));
     }
@@ -78,5 +81,10 @@ public class OrderItemServiceImpl implements OrderItemService {
         BigDecimal castedQuantity = new BigDecimal(quantity);
         return price.multiply(castedQuantity);
 
+    }
+
+    @Override
+    public List<OrderItem> getAllOrderItems() {
+        return orderItemRepository.findAll();
     }
 }

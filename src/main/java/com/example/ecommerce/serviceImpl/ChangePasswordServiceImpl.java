@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ChangePasswordServiceImpl implements ChangePasswordService {
@@ -21,8 +22,7 @@ public class ChangePasswordServiceImpl implements ChangePasswordService {
 
     @Override
     public ResponseEntity<?> changePassword(ChangePasswordReq changePasswordReq) {
-        User foundCustomer = customerRepository.findUserByEmail(changePasswordReq.getEmail());
-        if (foundCustomer == null) throw new UserNotFoundException("Customer does not exist");
+        User foundCustomer = customerRepository.findUserByEmail(changePasswordReq.getEmail()).orElseThrow(()->new UserNotFoundException("user does not exist"));
         if (!Objects.equals(foundCustomer.getPassword(), changePasswordReq.getOldPassword())) throw new PasswordMismatchException("Password does not match");
         if (!Objects.equals(changePasswordReq.getNewPassword(), changePasswordReq.getConfirmPassword())) throw new PasswordMismatchException("Password did not match");
         foundCustomer.setPassword(changePasswordReq.getNewPassword());

@@ -81,32 +81,4 @@ class CartServiceImplTest {
     }
 
 
-
-//    @Test
-//    void test_that_customer_can_remove_product_from_cart(){
-//            //given that a customer exist
-//            //and cart is not null
-//            //and a cart has cartproducts
-//            //when i remove a product from the cart
-//            //check that the product size in the cart reduces by 1
-//            Customer customer =  customerService.register(registerRequest);
-//            assertNotNull(customer.getId());
-//            Cart cart = customer.getCart();
-//            assertNotNull(cart);
-//            var cartProduct = cart.getCartProducts();
-//            AddToCartRequest addToCartRequest = new AddToCartRequest();
-//            addToCartRequest.setCartId(1);
-//            addToCartRequest.setQuantity(2);
-//            addToCartRequest.setProductName("tea");
-//            addToCartRequest.setProductId(1L);
-//            String response = customerService.addToCart(customer.getId(),addToCartRequest);
-//            addToCartRequest.setCartId(1);
-//            addToCartRequest.setQuantity(2);
-//            addToCartRequest.setProductName("milk");
-//            addToCartRequest.setProductId(2L);
-//            assertEquals("added successfully", response);
-//            cartService.removeProductFromCart(customer.getId(),1L);
-//            assertEquals(1,cart.getCartProducts().size());
-//
-//    }
 }

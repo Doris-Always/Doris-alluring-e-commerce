@@ -19,10 +19,7 @@ public class SendPasswordResetLinkImpl implements SendPasswordResetLink {
     JavaMailSender javaMailSender;
     @Override
     public ResponseEntity<?> sendLink(ResetLinkReq resetLinkReq) {
-        User foundCustomer = userRepository.findUserByEmail(resetLinkReq.getEmail());
-        if (foundCustomer == null){
-            throw new UserNotFoundException("User does not exist");
-        }
+        User foundCustomer = userRepository.findUserByEmail(resetLinkReq.getEmail()).orElseThrow(()->new UserNotFoundException("customer does not exist"));
         String url = "my reset password link ";
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom("okoloebelechukwu93@gmail.com");

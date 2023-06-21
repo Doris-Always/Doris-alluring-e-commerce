@@ -5,4 +5,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface EmailService {
     void sendOTP(String receiver);
+    void sendPaymentConfirmationEmail(String receiver);
 }

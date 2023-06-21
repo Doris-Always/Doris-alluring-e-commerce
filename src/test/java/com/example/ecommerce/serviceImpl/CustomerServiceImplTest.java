@@ -32,8 +32,7 @@ class CustomerServiceImplTest {
 
     @InjectMocks
     UserServiceImpl userService;
-//    @Autowired
-//    CustomerService customerService;
+
     @Mock
     EmailServiceImpl emailServiceImpl;
     @Captor

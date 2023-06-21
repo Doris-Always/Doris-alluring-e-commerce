@@ -43,4 +43,14 @@ public class EmailServiceImpl implements EmailService {
                 javaMailSender.send(simpleMailMessage);
 
     }
+
+    @Override
+    public void sendPaymentConfirmationEmail(String receiver) {
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom("okoloebelechukwu93@gmail.com");
+        simpleMailMessage.setTo(receiver);
+        simpleMailMessage.setSubject("Payment Verification From Doris Alluring");
+        simpleMailMessage.setText("your payment to Doris Alluring stores is successful,you will get your order delivered soon");
+        javaMailSender.send(simpleMailMessage);
+    }
 }
