@@ -20,7 +20,7 @@ public class User {
     @JoinColumn(name = "cart_id", referencedColumnName = "id")
     private Cart cart;
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @ElementCollection(targetClass = Role.class)
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
    private Set<Role> userRoles;
 

@@ -13,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -38,7 +40,7 @@ class ForgetPasswordServiceImplTest {
         User user = new User();
         user.setEmail("dorisebele47@gmail.com");
         user.setPassword("12345");
-        when(userRepository.findUserByEmail(resetPasswordReq.getEmail())).thenReturn(user);
+        when(userRepository.findUserByEmail(resetPasswordReq.getEmail())).thenReturn(Optional.of(user));
         ResponseEntity<?> resetResponse =
                 forgetPasswordService.resetPassword(resetPasswordReq);
         assertNotNull(user);

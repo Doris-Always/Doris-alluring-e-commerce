@@ -34,15 +34,17 @@ class ChangePasswordServiceImplTest {
         changePasswordReq.setOldPassword("23457");
         changePasswordReq.setNewPassword("98562");
         changePasswordReq.setConfirmPassword("98562");
-        Optional<User> foundCustomer = new User();
-        foundCustomer.setEmail("doris@gmail.com");
-        foundCustomer.setPassword("23457");
 
-        when(userRepository.findUserByEmail(changePasswordReq.getEmail())).thenReturn(foundCustomer);
-        when(userRepository.save(foundCustomer)).thenReturn(foundCustomer);
+        User customer = new User();
+        customer.setEmail("doris@gmail.com");
+        customer.setPassword("23457");
+
+        when(userRepository.save(customer)).thenReturn(customer);
+        when(userRepository.findUserByEmail(changePasswordReq.getEmail())).thenReturn(Optional.of(customer));
+
         changePasswordService.changePassword(changePasswordReq);
-         foundCustomer = userRepository.findUserByEmail(changePasswordReq.getEmail());
-        assertEquals(changePasswordReq.getNewPassword(),foundCustomer.getPassword());
+         var foundCustomer = userRepository.findUserByEmail(changePasswordReq.getEmail());
+        assertEquals(changePasswordReq.getNewPassword(),foundCustomer.get().getPassword());
 
 
     }

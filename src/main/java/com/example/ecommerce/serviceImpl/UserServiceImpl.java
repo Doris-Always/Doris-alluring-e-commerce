@@ -1,27 +1,28 @@
 package com.example.ecommerce.serviceImpl;
 
+import com.example.ecommerce.config.JwtService;
 import com.example.ecommerce.dto.request.*;
-import com.example.ecommerce.dto.response.LoginResponse;
 import com.example.ecommerce.dto.response.PaymentResponse;
-import com.example.ecommerce.exception.OrderNotFoundException;
-import com.example.ecommerce.exception.ProductNotSufficientException;
-import com.example.ecommerce.exception.UserAlreadyExistException;
-import com.example.ecommerce.exception.UserNotFoundException;
+import com.example.ecommerce.exception.*;
 import com.example.ecommerce.model.*;
 import com.example.ecommerce.repository.*;
 import com.example.ecommerce.service.*;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
@@ -53,43 +54,154 @@ public class UserServiceImpl implements UserService {
     PaymentService paymentService;
     @Autowired
     OrderHistoryRepository orderHistoryRepository;
+    @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
+    SecuredUserService securedUserService;
+    @Autowired
+    JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     ModelMapper mapper = new ModelMapper();
 
     @Override
-    public User register(UserRegisterRequest registerRequest) {
+    public String register(UserRegisterRequest registerRequest) {
         Optional<User> foundUser = userRepository.findUserByEmail(registerRequest.getEmail());
         if (foundUser.isPresent()){
             throw new UserAlreadyExistException("User Already Exist");
         }
-        String hashedPassword = PasswordEncoder.hashPassword(registerRequest.getPassword());
+        String hashedPassword = passwordEncoder.encode(registerRequest.getPassword());
         User user = mapper.map(registerRequest,User.class);
         user.setPassword(hashedPassword);
         Cart cart = new Cart();
         user.setCart(cart);
 
         Set<Role> userRoles = new HashSet<>();
-        userRoles.add(Role.USER);
-        userRoles.add(Role.CUSTOMER);
+        userRoles.add(Role.ADMIN);
         user.setUserRoles(userRoles);
-        emailService.sendOTP(user.getEmail());
         userRepository.save(user);
-        return user;
+        String token = generateOTP();
+        emailService.sendOTP(user.getEmail(),buildEmail(registerRequest.getFirstName(), token));
+
+        ConfirmationToken confirmationToken =
+                new ConfirmationToken(token, LocalDateTime.now(),LocalDateTime.now().plusMinutes(5),user);
+
+
+
+
 
 
     }
+
+    private String generateOTP(){
+        StringBuilder generatedOtp = new StringBuilder();
+        SecureRandom secureRandom = new SecureRandom();
+        int otp =100000 + secureRandom.nextInt(900000);
+        generatedOtp.append(otp);
+        return generatedOtp.toString();
+
+    }
+    private String buildEmail(String name, String token) {
+        return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
+                "\n" +
+                "<span style=\"display:none;font-size:1px;color:#fff;max-height:0\"></span>\n" +
+                "\n" +
+                "  <table role=\"presentation\" width=\"100%\" style=\"border-collapse:collapse;min-width:100%;width:100%!important\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n" +
+                "    <tbody><tr>\n" +
+                "      <td width=\"100%\" height=\"53\" bgcolor=\"#0b0c0c\">\n" +
+                "        \n" +
+                "        <table role=\"presentation\" width=\"100%\" style=\"border-collapse:collapse;max-width:580px\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n" +
+                "          <tbody><tr>\n" +
+                "            <td width=\"70\" bgcolor=\"#0b0c0c\" valign=\"middle\">\n" +
+                "                <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse\">\n" +
+                "                  <tbody><tr>\n" +
+                "                    <td style=\"padding-left:10px\">\n" +
+                "                  \n" +
+                "                    </td>\n" +
+                "                    <td style=\"font-size:28px;line-height:1.315789474;Margin-top:4px;padding-left:10px\">\n" +
+                "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Confirm your email</span>\n" +
+                "                    </td>\n" +
+                "                  </tr>\n" +
+                "                </tbody></table>\n" +
+                "              </a>\n" +
+                "            </td>\n" +
+                "          </tr>\n" +
+                "        </tbody></table>\n" +
+                "        \n" +
+                "      </td>\n" +
+                "    </tr>\n" +
+                "  </tbody></table>\n" +
+                "  <table role=\"presentation\" class=\"m_-6186904992287805515content\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;max-width:580px;width:100%!important\" width=\"100%\">\n" +
+                "    <tbody><tr>\n" +
+                "      <td width=\"10\" height=\"10\" valign=\"middle\"></td>\n" +
+                "      <td>\n" +
+                "        \n" +
+                "                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse\">\n" +
+                "                  <tbody><tr>\n" +
+                "                    <td bgcolor=\"#1D70B8\" width=\"100%\" height=\"10\"></td>\n" +
+                "                  </tr>\n" +
+                "                </tbody></table>\n" +
+                "        \n" +
+                "      </td>\n" +
+                "      <td width=\"10\" valign=\"middle\" height=\"10\"></td>\n" +
+                "    </tr>\n" +
+                "  </tbody></table>\n" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "  <table role=\"presentation\" class=\"m_-6186904992287805515content\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;max-width:580px;width:100%!important\" width=\"100%\">\n" +
+                "    <tbody><tr>\n" +
+                "      <td height=\"30\"><br></td>\n" +
+                "    </tr>\n" +
+                "    <tr>\n" +
+                "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
+                "      <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
+                "        \n" +
+                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Thank you for registering. Please copy the below token to activate your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">" + token + "</p></blockquote>\n The token will expire in 5 minutes time. <p>See you soon</p>" +
+                "        \n" +
+                "      </td>\n" +
+                "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
+                "    </tr>\n" +
+                "    <tr>\n" +
+                "      <td height=\"30\"><br></td>\n" +
+                "    </tr>\n" +
+                "  </tbody></table><div class=\"yj6qo\"></div><div class=\"adL\">\n" +
+                "\n" +
+                "</div></div>";
+    }
+
 
     @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        Optional<User> foundUser = userRepository.findUserByEmail(loginRequest.getEmail());
+    public String login(LoginRequest loginRequest) {
+        User foundUser = findUserByEmail(loginRequest.getEmail());
 
-        if (foundUser.isPresent() && PasswordEncoder.checkPwd(loginRequest.getPassword(), foundUser.get().getPassword())){
-            return new LoginResponse("login successful",HttpStatus.OK,LocalDateTime.now());
-
+        if (!passwordEncoder.matches(loginRequest.getPassword(), foundUser.getPassword())){
+            throw new PasswordMismatchException("incorrect password");
         }
-        return new LoginResponse("login failed, incorrect password", HttpStatus.UNAUTHORIZED,LocalDateTime.now());
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
+        );
+        UserDetails userDetails = securedUserService.loadUserByUsername(loginRequest.getEmail());
+        String token = jwtService.generateToken(userDetails);
+        return "Bearer "+token;
+
 
     }
+
+//    @Override
+//    public LoginResponse login(LoginRequest loginRequest) {
+//        Optional<User> foundUser = userRepository.findUserByEmail(loginRequest.getEmail());
+//
+//        if (foundUser.isPresent() && PasswordEncoder.checkPwd(loginRequest.getPassword(), foundUser.get().getPassword())){
+//            return new LoginResponse("login successful",HttpStatus.OK,LocalDateTime.now());
+//
+//        }
+//        return new LoginResponse("login failed, incorrect password", HttpStatus.UNAUTHORIZED,LocalDateTime.now());
+//
+//    }
 
     @Override
     public Long count() {
@@ -206,12 +318,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String makePayment(Long orderId,PaymentRequest paymentRequest) {
-        OrderHistory existingOrder = orderHistoryRepository.findById(orderId).orElseThrow(()->new IllegalArgumentException("order not found"));
-        paymentService.pay(paymentRequest);
+        OrderHistory existingOrder = orderHistoryRepository.findById(orderId).orElseThrow(()->new OrderNotFoundException("order not found"));
+        if (existingOrder.getPaymentStatus() == PaymentStatus.PENDING){
+            paymentService.pay(paymentRequest);
+        }else {
+            return "payment not successful,try again";
+        }
+        PaymentResponse paymentResponse = new PaymentResponse();
+        if (Objects.equals(paymentResponse.getMessage(), "Payment successful")){
         existingOrder.setPaymentStatus(PaymentStatus.PAYMENT_SUCCESSFUL);
         orderHistoryService.saveOrder(existingOrder);
         String receiver = existingOrder.getUser().getEmail();
-        emailService.sendPaymentConfirmationEmail(receiver);
+//        emailService.sendPaymentConfirmationEmail(receiver);
+        }
         return "payment successful";
     }
 

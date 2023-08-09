@@ -10,13 +10,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/product")
-public class ProductController {
+@RequestMapping("/api/v1/admin")
+public class AdminController {
     @Autowired
     UserService userService;
 
     @Autowired
     ProductService productService;
+
+    @GetMapping("/findAllCustomer")
+    public ResponseEntity<?> findAllCustomer(){
+        return new ResponseEntity<>(userService.getAllUser(), HttpStatus.OK);
+    }
+
+    @GetMapping("/findCustomer/{id}")
+    public ResponseEntity<?> findCustomerById(@PathVariable Long id){
+        return new ResponseEntity<>(userService.findUserById(id),HttpStatus.OK);
+    }
 
     @PostMapping("/addProduct")
     public ResponseEntity<?> addProduct(@RequestBody AddProductRequest addProductRequest){

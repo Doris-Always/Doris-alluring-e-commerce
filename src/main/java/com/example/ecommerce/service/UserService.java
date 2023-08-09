@@ -1,8 +1,6 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.request.*;
-import com.example.ecommerce.dto.response.LoginResponse;
-import com.example.ecommerce.dto.response.PaymentResponse;
 import com.example.ecommerce.model.OrderHistory;
 import com.example.ecommerce.model.User;
 
@@ -11,8 +9,9 @@ import java.util.Optional;
 
 
 public interface UserService {
-     User register(UserRegisterRequest registerRequest);
-     LoginResponse login(LoginRequest loginRequest);
+     String register(UserRegisterRequest registerRequest);
+//     LoginResponse login(LoginRequest loginRequest);
+     String login(LoginRequest loginRequest);
      String addToCart(Long id, AddToCartRequest cartRequest);
 
      List<User> getAllUser();

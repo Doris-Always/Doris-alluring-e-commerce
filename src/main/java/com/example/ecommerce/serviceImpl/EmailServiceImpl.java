@@ -1,12 +1,15 @@
 package com.example.ecommerce.serviceImpl;
 
 import com.example.ecommerce.service.EmailService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,8 @@ import java.security.SecureRandom;
 
 @Service
 @RequiredArgsConstructor
+@Async
+@Slf4j
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     @Value("${username}")
@@ -24,23 +29,31 @@ public class EmailServiceImpl implements EmailService {
 //        this.javaMailSender = javaMailSender;
 //    }
 
-    private String generateOTP(){
-        StringBuilder generatedOtp = new StringBuilder();
-        SecureRandom secureRandom = new SecureRandom();
-        int otp =100000 + secureRandom.nextInt(900000);
-        generatedOtp.append(otp);
-        return generatedOtp.toString();
 
-    }
 
     @Override
-    public void sendOTP(String receiver){
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-                simpleMailMessage.setFrom("okoloebelechukwu93@gmail.com");
-                simpleMailMessage.setTo(receiver);
-                simpleMailMessage.setSubject("One Time Password from Doris Alluring stores");
-                simpleMailMessage.setText("your one time password is: " + generateOTP() + "please secure it");
-                javaMailSender.send(simpleMailMessage);
+    public void sendOTP(String receiver,String message) {
+        try{
+            MimeMessage mailMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage, "Utf-8");
+            mimeMessageHelper.setSubject("Confirm your email address");
+            mimeMessageHelper.setTo(receiver);
+            mimeMessageHelper.setFrom("okoloebelechukwu93@gmail.com");
+            mimeMessageHelper.setText(message, true);
+            javaMailSender.send(mailMessage);
+        } catch (MessagingException e){
+            log.info("Problem 1: " + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (MailException e){
+            log.info("Problem 2" + e.getMessage());
+            throw new RuntimeException(e);
+        }
+//        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+//                simpleMailMessage.setFrom("okoloebelechukwu93@gmail.com");
+//                simpleMailMessage.setTo(receiver);
+//                simpleMailMessage.setSubject("One Time Password from Doris Alluring stores");
+//                simpleMailMessage.setText("your one time password is: " + generateOTP() + "please secure it");
+//                javaMailSender.send(simpleMailMessage);
 
     }
 

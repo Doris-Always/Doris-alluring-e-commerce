@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.example.ecommerce.model</OriginalElement>
+  <nodes>
+    <node x="2801.309888936031" y="17.99999999999997">com.example.ecommerce.model.OrderItem</node>
+    <node x="1668.3582523300092" y="-17.0">com.example.ecommerce.model.CartProduct</node>
+    <node x="1150.9178535732342" y="159.00000000000043">com.example.ecommerce.model.Role</node>
+    <node x="1943.052183720853" y="18.00000000000003">com.example.ecommerce.model.Address</node>
+    <node x="533.418515646647" y="-17.0">com.example.ecommerce.model.User</node>
+    <node x="-88.4724706046677" y="159.00000000000006">com.example.ecommerce.model.PaymentStatus</node>
+    <node x="2489.1193406611906" y="0.5000000000002842">com.example.ecommerce.model.OrderHistory</node>
+    <node x="219.65365450192746" y="158.9999999999999">com.example.ecommerce.model.Cart</node>
+    <node x="1393.9990437267322" y="35.50000000000006">com.example.ecommerce.model.Product</node>
+    <node x="2217.064946076375" y="158.99999999999915">com.example.ecommerce.model.Category</node>
+    <node x="807.7520786294972" y="71.5000000000002">com.example.ecommerce.model.Address.AddressBuilder</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.example.ecommerce.model.OrderHistory" target="com.example.ecommerce.model.User" relationship="TO_ONE">
+      <point x="0.0" y="212.0" />
+      <point x="2614.6193406611906" y="534.5" />
+      <point x="640.418515646647" y="534.5" />
+      <point x="0.0" y="229.5" />
+    </edge>
+    <edge source="com.example.ecommerce.model.OrderHistory" target="com.example.ecommerce.model.PaymentStatus" relationship="TO_ONE">
+      <point x="0.0" y="-212.0" />
+      <point x="2614.6193406611906" y="-64.5" />
+      <point x="35.527529395332294" y="-64.5" />
+      <point x="0.0" y="-53.5" />
+    </edge>
+    <edge source="com.example.ecommerce.model.OrderItem" target="com.example.ecommerce.model.OrderHistory" relationship="TO_ONE">
+      <point x="-108.5" y="15.0" />
+      <point x="125.5" y="14.999999999999687" />
+    </edge>
+    <edge source="com.example.ecommerce.model.Cart" target="com.example.ecommerce.model.CartProduct" relationship="TO_MANY">
+      <point x="0.0" y="-53.5" />
+      <point x="346.15365450192746" y="-49.5" />
+      <point x="1775.3582523300092" y="-49.5" />
+      <point x="0.0" y="-229.5" />
+    </edge>
+    <edge source="com.example.ecommerce.model.CartProduct" target="com.example.ecommerce.model.Category" relationship="TO_ONE">
+      <point x="-107.00025233000929" y="0.0" />
+      <point x="1639.0" y="212.5" />
+      <point x="1639.0" y="-34.5" />
+      <point x="2323.065" y="-34.5" />
+      <point x="5.39236252734554E-5" y="-53.49999999999915" />
+    </edge>
+    <edge source="com.example.ecommerce.model.User" target="com.example.ecommerce.model.Cart" relationship="TO_ONE">
+      <point x="-106.99951564664707" y="0.0" />
+      <point x="126.50034549807253" y="1.1368683772161603E-13" />
+    </edge>
+    <edge source="com.example.ecommerce.model.OrderItem" target="com.example.ecommerce.model.Product" relationship="TO_ONE">
+      <point x="0.0" y="194.50000000000003" />
+      <point x="2909.809888936031" y="519.5" />
+      <point x="1500.9990437267322" y="519.5" />
+      <point x="0.0" y="177.0" />
+    </edge>
+    <edge source="com.example.ecommerce.model.User" target="com.example.ecommerce.model.Role" relationship="TO_MANY">
+      <point x="106.99999999999997" y="-158.4999999999998" />
+      <point x="1242.4178535732342" y="54.0000000000002" />
+      <point x="0.0" y="-53.5" />
+    </edge>
+    <edge source="com.example.ecommerce.model.Product" target="com.example.ecommerce.model.Category" relationship="TO_ONE">
+      <point x="106.9999562732678" y="-5.6843418860808015E-14" />
+      <point x="1639.0" y="212.5" />
+      <point x="1639.0" y="-34.5" />
+      <point x="2323.065" y="-34.5" />
+      <point x="5.39236252734554E-5" y="-53.49999999999915" />
+    </edge>
+    <edge source="com.example.ecommerce.model.Address.AddressBuilder" target="com.example.ecommerce.model.Address" relationship="INNER_CLASS">
+      <point x="0.0" y="141.00000000000003" />
+      <point x="949.2520786294972" y="474.5" />
+      <point x="2050.052183720853" y="474.5" />
+      <point x="0.0" y="194.49999999999997" />
+    </edge>
+    <edge source="com.example.ecommerce.model.CartProduct" target="com.example.ecommerce.model.Cart" relationship="TO_ONE">
+      <point x="-2.523300092889258E-4" y="229.5" />
+      <point x="1775.358" y="459.5" />
+      <point x="504.0" y="459.5" />
+      <point x="504.0" y="212.5" />
+      <point x="126.50034549807253" y="1.1368683772161603E-13" />
+    </edge>
+    <edge source="com.example.ecommerce.model.OrderHistory" target="com.example.ecommerce.model.OrderItem" relationship="TO_MANY">
+      <point x="125.5" y="-3.126388037344441E-13" />
+      <point x="-108.5" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.5120000000000002" showDependencies="true" x="987.9296874999995" y="169.546875" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

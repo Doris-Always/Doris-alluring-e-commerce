@@ -21,4 +21,5 @@ public class Product {
     private BigDecimal pricePerUnit;
     @Enumerated(EnumType.STRING)
     private Category category;
+    //add description
 }
