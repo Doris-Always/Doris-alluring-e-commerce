@@ -1,12 +1,10 @@
 package com.example.ecommerce.controller;
 
-import com.example.ecommerce.dto.request.ChangePasswordReq;
-import com.example.ecommerce.dto.request.LoginRequest;
-import com.example.ecommerce.dto.request.ResetPasswordReq;
-import com.example.ecommerce.dto.request.UserRegisterRequest;
+import com.example.ecommerce.dto.request.*;
 import com.example.ecommerce.service.ChangePasswordService;
 import com.example.ecommerce.service.ForgetPasswordService;
 import com.example.ecommerce.service.UserService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +36,22 @@ public class UserController {
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordReq changePasswordReq){
         return new ResponseEntity<>(changePasswordService.changePassword(changePasswordReq),HttpStatus.OK);
     }
-    @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestBody ResetPasswordReq resetPasswordReq){
+    @PostMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordReq resetPasswordReq){
         return new ResponseEntity<>(forgetPasswordService.resetPassword(resetPasswordReq),HttpStatus.OK);
     }
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
+            return new ResponseEntity<>(forgetPasswordService.forgotPassword(forgotPasswordRequest),HttpStatus.OK);
+
+    }
+    @PostMapping("/confirmToken")
+    public ResponseEntity<?> confirmToken(@RequestBody ConfirmationTokenRequest confirmationTokenRequest){
+        return new ResponseEntity<>(userService.confirmToken(confirmationTokenRequest),HttpStatus.OK);
+    }
+    @PostMapping("/resendToken")
+    public ResponseEntity<?> resendToken(@RequestBody ResendTokenRequest resendTokenRequest) throws MessagingException {
+        return new ResponseEntity<>(userService.resendToken(resendTokenRequest),HttpStatus.OK);
+    }
+
 }

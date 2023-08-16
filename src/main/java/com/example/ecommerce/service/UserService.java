@@ -4,6 +4,7 @@ import com.example.ecommerce.dto.request.*;
 import com.example.ecommerce.dto.response.RegistrationResponse;
 import com.example.ecommerce.model.OrderHistory;
 import com.example.ecommerce.model.User;
+import jakarta.mail.MessagingException;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,9 @@ public interface UserService {
      User findUserByEmail(String email);
 
      User updateUserInfo(Long userId,UpdateUserRequest updateUserRequest);
+
+     String resendToken(ResendTokenRequest resendTokenRequest) throws MessagingException;
+
      Long count();
 
      void removeItemFromCart(Long userId, Long productId);

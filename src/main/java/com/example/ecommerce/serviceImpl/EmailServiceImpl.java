@@ -1,5 +1,6 @@
 package com.example.ecommerce.serviceImpl;
 
+import com.example.ecommerce.dto.request.OtpRequest;
 import com.example.ecommerce.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -12,8 +13,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.security.SecureRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
         try{
             MimeMessage mailMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage, "Utf-8");
-            mimeMessageHelper.setSubject("Confirm your email address");
+            mimeMessageHelper.setSubject("Email Verification One Time Password");
             mimeMessageHelper.setTo(receiver);
             mimeMessageHelper.setFrom("okoloebelechukwu93@gmail.com");
             mimeMessageHelper.setText(message, true);
