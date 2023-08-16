@@ -19,8 +19,7 @@ public class Cart {
 
 //    private long customerId;
 
-    @OneToMany(mappedBy = "cart")
-//            (fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "cart" ,fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<CartProduct> cartProducts = new ArrayList<>();
 
 

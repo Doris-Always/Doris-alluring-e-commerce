@@ -3,6 +3,7 @@ package com.example.ecommerce.serviceImpl;
 import com.example.ecommerce.config.JwtService;
 import com.example.ecommerce.dto.request.*;
 import com.example.ecommerce.dto.response.PaymentResponse;
+import com.example.ecommerce.dto.response.RegistrationResponse;
 import com.example.ecommerce.exception.*;
 import com.example.ecommerce.model.*;
 import com.example.ecommerce.repository.*;
@@ -10,6 +11,8 @@ import com.example.ecommerce.service.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,12 +63,15 @@ public class UserServiceImpl implements UserService {
     SecuredUserService securedUserService;
     @Autowired
     JwtService jwtService;
+
+    @Autowired
+    ConfirmTokenService confirmTokenService;
     private final PasswordEncoder passwordEncoder;
 
     ModelMapper mapper = new ModelMapper();
 
     @Override
-    public String register(UserRegisterRequest registerRequest) {
+    public RegistrationResponse register(UserRegisterRequest registerRequest) {
         Optional<User> foundUser = userRepository.findUserByEmail(registerRequest.getEmail());
         if (foundUser.isPresent()){
             throw new UserAlreadyExistException("User Already Exist");
@@ -77,20 +83,23 @@ public class UserServiceImpl implements UserService {
         user.setCart(cart);
 
         Set<Role> userRoles = new HashSet<>();
-        userRoles.add(Role.ADMIN);
+        userRoles.add(Role.CUSTOMER);
         user.setUserRoles(userRoles);
         userRepository.save(user);
+
         String token = generateOTP();
         emailService.sendOTP(user.getEmail(),buildEmail(registerRequest.getFirstName(), token));
 
         ConfirmationToken confirmationToken =
-                new ConfirmationToken(token, LocalDateTime.now(),LocalDateTime.now().plusMinutes(5),user);
+                new ConfirmationToken(token, LocalDateTime.now() ,LocalDateTime.now().plusMinutes(5),user);
+        confirmationToken.setConfirmAt(LocalDateTime.now());
+        confirmTokenService.saveConfirmationToken(confirmationToken);
 
-
-
-
-
-
+        return RegistrationResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .message("token sent to your email")
+                .build();
     }
 
     private String generateOTP(){
@@ -191,17 +200,24 @@ public class UserServiceImpl implements UserService {
 
     }
 
-//    @Override
-//    public LoginResponse login(LoginRequest loginRequest) {
-//        Optional<User> foundUser = userRepository.findUserByEmail(loginRequest.getEmail());
-//
-//        if (foundUser.isPresent() && PasswordEncoder.checkPwd(loginRequest.getPassword(), foundUser.get().getPassword())){
-//            return new LoginResponse("login successful",HttpStatus.OK,LocalDateTime.now());
-//
-//        }
-//        return new LoginResponse("login failed, incorrect password", HttpStatus.UNAUTHORIZED,LocalDateTime.now());
-//
-//    }
+    @Override
+    public String confirmToken(ConfirmationTokenRequest confirmationTokenRequest) {
+        User foundUser = findUserByEmail(confirmationTokenRequest.getEmail());
+        ConfirmationToken confirmationToken = confirmTokenService.getConfirmationToken(confirmationTokenRequest.getToken())
+                .orElseThrow(()-> new TokenNotFoundException("token does not exist"));
+        if (confirmationToken.getExpiredAt().isBefore(LocalDateTime.now())){
+            throw new IllegalStateException("token is expired");
+        }
+        if (confirmationToken.getConfirmAt() != null){
+            throw new IllegalStateException("token has already been confirmed");
+        }
+
+        confirmTokenService.setExpiredAt(confirmationToken.getToken());
+        foundUser.setValid(true);
+        userRepository.save(foundUser);
+        return "token confirmed,you are now verified";
+    }
+
 
     @Override
     public Long count() {
@@ -215,9 +231,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findUserById(Long userId) {
+    public User findUserById(Long userId) {
         if (userRepository.findById(userId).isEmpty()) throw new UserNotFoundException("user not found");
-        return userRepository.findById(userId);
+        return userRepository.findById(userId).get();
 //        return user.get();
     }
 
@@ -257,7 +273,7 @@ public class UserServiceImpl implements UserService {
           CartProduct savedCartProduct = cartProductService.addCartProduct(cartProduct);
           foundUser.getCart().getCartProducts().add(savedCartProduct);
           userRepository.save(foundUser);
-           return "added successfully";
+           return "added successfully"  ;
 
         }
 
@@ -284,13 +300,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public OrderHistory orderProduct(OrderProductRequest orderProductRequest) {
-        Optional<User> existingUser = findUserById(orderProductRequest.getUserId());
-        if (existingUser.isEmpty()){
-            throw new UserNotFoundException("user does not exist,please register");
-        }
+
+        User existingUser = findUserById(orderProductRequest.getUserId());
+
         Product existingProduct = productService.findProductById(orderProductRequest.getProductId());
         OrderHistory orderHistory = new OrderHistory();
-        orderHistory.setUser(existingUser.get());
+        orderHistory.setUser(existingUser);
         orderHistory.setDeliveryAddress(orderProductRequest.getDeliveryAddress());
         OrderItem orderItem = new OrderItem();
         orderItem.setProduct(existingProduct);

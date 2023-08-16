@@ -2,6 +2,7 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.request.AddProductRequest;
 import com.example.ecommerce.dto.request.UpdateProductRequest;
+import com.example.ecommerce.exception.UserNotFoundException;
 import com.example.ecommerce.service.ProductService;
 import com.example.ecommerce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,17 @@ public class AdminController {
     ProductService productService;
 
     @GetMapping("/findAllCustomer")
-    public ResponseEntity<?> findAllCustomer(){
+    public ResponseEntity<?> findAllCustomer() {
         return new ResponseEntity<>(userService.getAllUser(), HttpStatus.OK);
     }
 
     @GetMapping("/findCustomer/{id}")
     public ResponseEntity<?> findCustomerById(@PathVariable Long id){
-        return new ResponseEntity<>(userService.findUserById(id),HttpStatus.OK);
+        try {
+             return new ResponseEntity<>(userService.findUserById(id),HttpStatus.OK);
+        }catch ( UserNotFoundException userNotFoundException){
+            return  new ResponseEntity<>(userNotFoundException.getMessage(), HttpStatus.OK);
+        }
     }
 
     @PostMapping("/addProduct")
