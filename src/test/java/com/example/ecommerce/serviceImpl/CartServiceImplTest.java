@@ -92,7 +92,7 @@ class CartServiceImplTest {
 
         @Test
         void test_registered_customer_can_add_product_to_cart() {
-            doNothing().when(emailServiceImpl).sendOTP(anyString(),anyString());
+//            doNothing().when(emailServiceImpl).sendOTP(anyString(),anyString());
             deleteOtherUsers();
             RegistrationResponse response = userService.register(create());
             assertEquals(response.getMessage(),"token sent to your email");

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class ConfirmationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +20,7 @@ public class ConfirmationToken {
     private String token;
     @NotNull
     private LocalDateTime createdAt;
-    @NotNull
+
     private LocalDateTime confirmAt;
     @NotNull
     private LocalDateTime expiredAt;

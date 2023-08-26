@@ -1,5 +1,6 @@
 package com.example.ecommerce.serviceImpl;
 
+import com.example.ecommerce.dto.request.EmailRequest;
 import com.example.ecommerce.dto.request.OtpRequest;
 import com.example.ecommerce.service.EmailService;
 import jakarta.mail.MessagingException;
@@ -31,14 +32,14 @@ public class EmailServiceImpl implements EmailService {
 
 
     @Override
-    public void sendOTP(String receiver,String message) {
+    public void sendOTP(EmailRequest emailRequest) {
         try{
             MimeMessage mailMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage, "Utf-8");
             mimeMessageHelper.setSubject("Email Verification One Time Password");
-            mimeMessageHelper.setTo(receiver);
+            mimeMessageHelper.setTo(emailRequest.getReceiver());
             mimeMessageHelper.setFrom("okoloebelechukwu93@gmail.com");
-            mimeMessageHelper.setText(message, true);
+            mimeMessageHelper.setText(emailRequest.getMessage(), true);
             javaMailSender.send(mailMessage);
         } catch (MessagingException e){
             log.info("Problem 1: " + e.getMessage());

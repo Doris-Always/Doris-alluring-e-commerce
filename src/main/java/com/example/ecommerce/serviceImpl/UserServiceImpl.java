@@ -89,7 +89,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         String token = generateOTP();
-        emailService.sendOTP(user.getEmail(),buildEmail(registerRequest.getFirstName(), token));
+        EmailRequest emailRequest = new EmailRequest();
+        emailRequest.setMessage(buildEmail(registerRequest.getFirstName(),token));
+        emailRequest.setReceiver(registerRequest.getEmail());
+        emailService.sendOTP(emailRequest);
+//        buildEmail(registerRequest.getFirstName(), token)
 
         ConfirmationToken confirmationToken =
                 new ConfirmationToken(token, LocalDateTime.now() ,LocalDateTime.now().plusMinutes(5),user);
@@ -146,20 +150,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public String resendToken(ResendTokenRequest resendTokenRequest) {
         User foundUser = findUserByEmail(resendTokenRequest.getEmail());
-        if (foundUser.isValid()){ throw new IllegalStateException("You are already verified, proceed to login");}
+       if (foundUser.isValid()){ throw new IllegalStateException("You are already verified, proceed to login");
+       }
         else {
             String token = generateOTP();
-            emailService.sendOTP(resendTokenRequest.getEmail(), buildEmail(foundUser.getFirstName(), token));
+            EmailRequest emailRequest = new EmailRequest();
+            emailRequest.setReceiver(foundUser.getEmail());
+            emailRequest.setMessage(buildEmail(foundUser.getFirstName(),token));
+          emailService.sendOTP(emailRequest);
 
-            ConfirmationToken confirmationToken = new ConfirmationToken(
-                    token,
-                    LocalDateTime.now(),
-                    LocalDateTime.now().plusMinutes(5),
-                    foundUser
-            );
-            confirmTokenService.saveConfirmationToken(confirmationToken);
-        }
-        return "token has been resent successfully";
+          ConfirmationToken confirmationToken = new ConfirmationToken(
+                  token,
+                  LocalDateTime.now(),
+                  LocalDateTime.now().plusMinutes(5),
+                     foundUser);
+           confirmTokenService.saveConfirmationToken(confirmationToken);
+     }
+      return "token has been resent successfully";
     }
 
 
