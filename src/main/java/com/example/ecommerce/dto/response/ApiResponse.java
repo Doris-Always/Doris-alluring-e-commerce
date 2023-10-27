@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ApiResponse <T>{
+    private  boolean isSuccessful;
     private String message;
     private LocalDateTime timeStamp;
     private T data;
@@ -19,5 +20,9 @@ public class ApiResponse <T>{
     public ApiResponse(String message, LocalDateTime timeStamp) {
         this.message = message;
         this.timeStamp = timeStamp;
+    }
+    public ApiResponse(boolean isSuccessful, T data) {
+        this.isSuccessful = isSuccessful;
+        this.data = data;
     }
 }

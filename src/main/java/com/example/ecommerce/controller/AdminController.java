@@ -1,7 +1,9 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.request.AddProductRequest;
+import com.example.ecommerce.dto.request.FindAllRequest;
 import com.example.ecommerce.dto.request.UpdateProductRequest;
+import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.exception.UserNotFoundException;
 import com.example.ecommerce.service.ProductService;
 import com.example.ecommerce.service.UserService;
@@ -40,6 +42,12 @@ public class AdminController {
     @GetMapping("/allProduct")
     public ResponseEntity<?> getAllProduct(){
         return new ResponseEntity<>(productService.findAllProduct(),HttpStatus.OK);
+    }
+    @GetMapping("FIND_ALL_PRODUCTS_WITH_PAGINATION_AND_SORTING_WITH_DIRECTION")
+    public ResponseEntity<?>  findAllProductsWithPaginationAndSortingWithDirection(@RequestBody FindAllRequest findAllProductRequest) {
+        var result = productService.findAllProductsWithPaginationAndSortingWithDirection(findAllProductRequest);
+        return new ResponseEntity<>(new ApiResponse(true, result), HttpStatus.OK);
+
     }
     @GetMapping("/getProduct/{id}")
     public ResponseEntity<?> getProductById(@PathVariable("id") Long id){

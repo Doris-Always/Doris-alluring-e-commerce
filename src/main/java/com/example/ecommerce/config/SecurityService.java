@@ -23,11 +23,11 @@ public class SecurityService {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
+                .requestMatchers("/api/v1/admin/**").permitAll()
+//                .hasAuthority("ADMIN")
                 .requestMatchers("api/v1/ecommerce/**").hasAuthority("CUSTOMER")
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .anyRequest()
-                .authenticated()
+//                .anyRequest()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -39,3 +39,4 @@ public class SecurityService {
 
     }
 }
+
